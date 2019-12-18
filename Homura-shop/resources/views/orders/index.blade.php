@@ -5,7 +5,14 @@
 <div class="row">
 <div class="col-lg-10 col-lg-offset-1">
 <div class="panel panel-default">
-  <div class="panel-heading">订单列表</div>
+  <div class="panel-heading">订单列表
+
+            <form action="{{ route('products.index') }}" class="form-inline search-form">
+              <input type="text" class="form-control input-sm" name="search" placeholder="搜索">
+              <button class="btn btn-primary btn-sm">搜索</button>
+            </form>
+          
+  </div>
   <div class="panel-body">
     <ul class="list-group">
       @foreach($orders as $order)
@@ -16,6 +23,7 @@
             <span class="pull-right">{{ $order->created_at->format('Y-m-d H:i:s') }}</span>
           </div>
           <div class="panel-body">
+
             <table class="table">
               <thead>
                 <tr>
