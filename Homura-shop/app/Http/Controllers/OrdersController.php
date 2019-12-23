@@ -18,8 +18,32 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use App\Models\CouponCode;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\CloseOrder;
+
 class OrdersController extends Controller
 {
+   public function cancelorder(Order $order,Request $request)
+   {
+        if(Auth::check()&&(Auth::id()==$order->user->id))
+         {
+            
+            if ($order->paid_at) {
+               //
+            }
+            else{
+            //\DB::transaction(function() {
+                // 将订单的 closed 字段标记为 true，即关闭订单
+                $order->closed = true;
+                $order->save();
+                // 循环遍历订单中的商品 SKU，将订单中的数量加回到 SKU 的库存中去
+                foreach ($order->items as $item) {
+                    $item->productSku->addStock($item->amount);
+                }
+            //    });
+            }
+            return redirect()->route('orders.show',['order'=>$order->id]);
+         }
+   }
    public function store(Request $request)
     {
         	$user  = Auth::user();
@@ -109,7 +133,10 @@ class OrdersController extends Controller
             // 将下单的商品从购物车中移除
             $skuIds = collect($request->input('items'))->pluck('sku_id');
             $user->cartItems()->whereIn('product_sku_id', $skuIds)->delete();
-
+            $now =  Carbon::now();
+            $startjob =(new CloseOrder($order))->delay($now->addMinutes(30));
+            dispatch($startjob);
+            //$this->dispatch(new CloseOrder($order,30));
         return $order;
     }
      public function index(Request $request)
@@ -125,6 +152,16 @@ class OrdersController extends Controller
     	{
     		return redirect()->route('login');
     	}
+    }
+    public function findbyid(Request $request)
+    {
+        if(Auth::check())
+        {
+            $data = $request->all();
+            $orderid = $data['search'];
+             $orders = Order::with(['items.product', 'items.productSku'])->where('user_id',Auth::id())->where('no', 'like', "%".$orderid."%")->orderBy('created_at', 'desc')->paginate(16);
+              return view('orders.index', ['orders' => $orders]);
+        }
     }
     public function show(Order $order, Request $request)
     {	

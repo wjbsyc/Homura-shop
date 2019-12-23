@@ -22,7 +22,7 @@ class OrdersController extends Controller
      * @param Content $content
      * @return Content
      */
-    public function index(Content $content)
+    public function index(Content $content,Request $request)
     {
         return $content
             ->header('Index')
@@ -82,8 +82,19 @@ class OrdersController extends Controller
      */
         protected function grid()
     {
-        return Admin::grid(Order::class, function (Grid $grid) {
-            
+        //return $id;
+        return Admin::grid(Order::class, function (Grid $grid)  {
+            $grid->filter(function($filter){
+
+                // 去掉默认的id过滤器
+                $filter->disableIdFilter();
+
+                // 在这里添加字段过滤器
+                $filter->like('no', '订单号');
+                
+
+            });
+            //if($id) $grid->model()->where('no','like',"%".$id."%")->whereNotNull('paid_at')->orderBy('paid_at', 'desc');
             $grid->model()->whereNotNull('paid_at')->orderBy('paid_at', 'desc');
 
             $grid->no('订单流水号');

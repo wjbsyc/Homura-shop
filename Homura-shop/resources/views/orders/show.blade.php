@@ -81,12 +81,13 @@
         @if(!$order->paid_at && !$order->closed)
           <div class="payment-buttons">
           <a class="btn btn-primary btn-sm" href="{{ route('payment.alipay', ['order' => $order->id]) }}">支付宝支付</a>
+           <a class="btn btn-primary btn-sm" href="{{ route('cancel',['order' => $order->id]) }}">取消订单</a>
           </div>
         @endif
          @if($order->ship_status === \App\Models\Order::SHIP_STATUS_DELIVERED)
         <div class="receive-button">
           <form method="post" action="{{ route('orders.received', [$order->id]) }}">
-            <!-- csrf token 不能忘 -->
+
             {{ csrf_field() }}
             <button type="submit" class="btn btn-sm btn-success">确认收货</button>
           </form>

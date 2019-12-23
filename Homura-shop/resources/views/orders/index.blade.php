@@ -7,10 +7,10 @@
 <div class="panel panel-default">
   <div class="panel-heading">订单列表
 
-            <form action="{{ route('products.index') }}" class="form-inline search-form">
-              <input type="text" class="form-control input-sm" name="search" placeholder="搜索">
-              <button class="btn btn-primary btn-sm">搜索</button>
-            </form>
+  <form action="{{url('findorder')}}" class="form-inline search-form pull-right">
+    <input type="text" class="form-control input-sm" name="search" placeholder="订单号">
+    <button class="btn btn-primary btn-sm">搜索</button>
+  </form>
           
   </div>
   <div class="panel-body">
